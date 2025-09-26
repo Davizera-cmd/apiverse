@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APIVERSE - Marketplace de APIs</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono&display=swap');
+        
+        :root {
+            --accent: hsl(183, 38%, 57%);
+            --shadow: hsl(10, 100%, 60%);
+            --dark-bg: #0a0a0a;
+            --dark-surface: #141414;
+            --border: 2px;
+            --corner: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--accent);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                linear-gradient(90deg, var(--accent) 1px, transparent 1px 45px) 50% 50% / 45px 45px,
+                linear-gradient(var(--accent) 1px, transparent 1px 45px) 50% 50% / 45px 45px;
+            opacity: 0.03;
+            pointer-events: none;
+        }
+        
+        /* Header */
+        .header {
+            padding: 1rem 2rem;
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: var(--border) solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo-icon {
+            width: 2rem;
+            height: 2rem;
+            fill: var(--shadow);
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-links a:hover {
+            color: var(--shadow);
+            text-shadow: 0 0 10px var(--shadow);
+        }
+        
+        .cart-icon {
+            width: 1.2rem;
+            height: 1.2rem;
+            fill: currentColor;
+        }
+        
+        .cart-counter {
+            background: var(--shadow);
+            color: white;
+            border-radius: 50%;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--shadow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: glitch 5s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { filter: hue-rotate(0deg); }
+            25% { filter: hue-rotate(90deg) saturate(150%); }
+            50% { filter: hue-rotate(180deg) saturate(200%); }
+            75% { filter: hue-rotate(270deg) saturate(150%); }
+        }
+        
+        .hero h1:hover {
+            animation: glitch 0.5s infinite, textGlitch 0.1s infinite;
+        }
+        
+        @keyframes textGlitch {
+            0% { text-shadow: 2px 0 var(--shadow), -2px 0 var(--accent); }
+            25% { text-shadow: -2px 0 var(--shadow), 2px 0 var(--accent); }
+            50% { text-shadow: 2px 2px var(--shadow), -2px -2px var(--accent); }
+            75% { text-shadow: -2px 2px var(--shadow), 2px -2px var(--accent); }
+            100% { text-shadow: 2px 0 var(--shadow), -2px 0 var(--accent); }
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(108, 206, 217, 0.8);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+        
+        .cta-button {
+            background: transparent;
+            border: var(--border) solid var(--accent);
+            color: var(--accent);
+            padding: 1rem 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%);
+            transition: all 0.3s;
+        }
+        
+        .cta-button:hover {
+            background: var(--accent);
+            color: var(--dark-bg);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--accent);
+        }
+        
+        /* Features */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .features h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .features h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: var(--shadow);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid var(--accent);
+            padding: 2rem;
+            position: relative;
+            backdrop-filter: blur(10px);
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(108, 206, 217, 0.3);
+            border-color: var(--shadow);
+        }
+        
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 1rem;
+            fill: var(--shadow);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover .feature-icon {
+            fill: var(--accent);
+            transform: scale(1.1);
+        }
+        
+        .feature-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* API Showcase */
+        .api-showcase {
+            padding: 4rem 2rem;
+            background: rgba(20, 20, 20, 0.5);
+        }
+        
+        .api-showcase h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .api-card {
+            background: var(--dark-surface);
+            border: 1px solid rgba(108, 206, 217, 0.3);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .api-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: scan 3s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .api-card:hover {
+            border-color: var(--accent);
+            transform: scale(1.02);
+        }
+        
+        .api-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .api-category {
+            background: var(--shadow);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+        }
+        
+        .api-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+        
+        .api-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .api-description {
+            color: rgba(108, 206, 217, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .api-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .api-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .stat-icon {
+            width: 0.9rem;
+            height: 0.9rem;
+            fill: var(--accent);
+        }
+        
+        /* Modal de Carrinho */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .cart-modal.active {
+            display: flex;
+        }
+        
+        .cart-content {
+            background: var(--dark-surface);
+            border: var(--border) solid var(--accent);
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%);
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(108, 206, 217, 0.2);
+            margin-bottom: 1rem;
+        }
+        
+        .cart-item-info h4 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 0.25rem;
+        }
+        
+        .cart-item-price {
+            color: var(--shadow);
+            font-weight: bold;
+        }
+        
+        .cart-remove {
+            background: transparent;
+            border: 1px solid var(--shadow);
+            color: var(--shadow);
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .cart-remove:hover {
+            background: var(--shadow);
+            color: var(--dark-bg);
+        }
+        
+        .cart-total {
+            border-top: var(--border) solid var(--accent);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .cart-total-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+        
+        .buy-button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Space Mono', monospace;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .buy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(108, 206, 217, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .buy-button:hover::before {
+            left: 100%;
+        }
+        
+        .buy-button:hover {
+            background: var(--accent);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        /* Modal de Compra */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--dark-surface);
+            border: var(--border) solid var(--accent);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--accent);
+        }
+        
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--shadow);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            transform: rotate(90deg);
+            color: var(--accent);
+        }
+        
+        .purchase-steps {
+            margin: 1.5rem 0;
+        }
+        
+        .step {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+        
+        .step::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            background: var(--accent);
+            color: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .step.active::before {
+            background: var(--shadow);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .step h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .payment-method {
+            flex: 1;
+            padding: 1rem;
+            background: var(--dark-bg);
+            border: 1px solid rgba(108, 206, 217, 0.3);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover,
+        .payment-method.selected {
+            border-color: var(--accent);
+            background: rgba(108, 206, 217, 0.1);
+        }
+        
+        .confirm-button {
+            width: 100%;
+            background: var(--accent);
+            border: none;
+            color: var(--dark-bg);
+            padding: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .confirm-button:hover {
+            background: var(--shadow);
+            box-shadow: 0 0 30px var(--shadow);
+        }
+        
+        /* Modal de Confirmação de Compra */
+        .success-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .success-modal.active {
+            display: flex;
+        }
+        
+        .success-content {
+            background: var(--dark-surface);
+            border: var(--border) solid var(--accent);
+            padding: 3rem 2rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%);
+            text-align: center;
+            animation: successPulse 0.5s ease-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-icon {
+            width: 4rem;
+            height: 4rem;
+            fill: var(--accent);
+            margin-bottom: 1.5rem;
+            animation: checkmark 1s ease-out;
+        }
+        
+        @keyframes checkmark {
+            0% { transform: scale(0) rotate(-45deg); }
+            50% { transform: scale(1.2) rotate(-45deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        .success-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+        
+        .success-details {
+            background: rgba(108, 206, 217, 0.1);
+            border: 1px solid var(--accent);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            clip-path: polygon(0 0, 100% 0, 98% 100%, 2% 100%);
+        }
+        
+        .success-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .success-item:last-child {
+            margin-bottom: 0;
+            border-top: 1px solid var(--accent);
+            padding-top: 0.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .success-info {
+            color: rgba(108, 206, 217, 0.8);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .success-close {
+            background: var(--accent);
+            border: none;
+            color: var(--dark-bg);
+            padding: 1rem 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%);
+        }
+        
+        .success-close:hover {
+            background: var(--shadow);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 2rem;
+            background: var(--dark-surface);
+            border-top: var(--border) solid var(--accent);
+            text-align: center;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            color: rgba(108, 206, 217, 0.6);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                    <path d="M2 17L12 22L22 17"/>
+                    <path d="M2 12L12 17L22 12"/>
+                </svg>
+                APIVERSE
+            </a>
+            <ul class="nav-links">
+                <li><a href="#apis">APIs</a></li>
+                <li><a href="#docs">Documentação</a></li>
+                <li><a href="#pricing">Preços</a></li>
+                <li><a href="#support">Suporte</a></li>
+                <li>
+                    <a href="#cart" onclick="openCart()" style="position: relative;">
+                        <svg class="cart-icon" viewBox="0 0 24 24">
+                            <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z"/>
+                        </svg>
+                        Carrinho
+                        <span class="cart-counter" id="cartCounter">0</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>O Marketplace do Futuro</h1>
+        <p>Compre, venda e integre APIs revolucionárias. Conecte seu projeto ao universo digital com apenas algumas linhas de código.</p>
+        <button class="cta-button" onclick="scrollToAPIs()">EXPLORAR APIs →</button>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <h2>Por que APIVERSE?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24">
+                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4L21.35,6.68C21.16,6.96 20.95,7.22 20.71,7.46L12,8.5L3.29,7.46C3.05,7.22 2.84,6.96 2.65,6.68L12,4M12,10.5L20.75,9.54C20.94,10.34 21,11.16 21,12A9,9 0 0,1 20.75,14.46L12,13.5L3.25,14.46A9,9 0 0,1 3,12C3,11.16 3.06,10.34 3.25,9.54L12,10.5Z"/>
+                </svg>
+                <h3>Integração Instantânea</h3>
+                <p>Deploy em segundos com nossa infraestrutura serverless de alta performance</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24">
+                    <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.4 16,13V16C16,17.1 15.2,18 14.2,18H9.8C8.8,18 8,17.1 8,16V13C8,12.4 8.4,11.5 9,11.5V10C9,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.2,8.7 10.2,10V11.5H13.8V10C13.8,8.7 12.8,8.2 12,8.2Z"/>
+                </svg>
+                <h3>Segurança Quantum</h3>
+                <p>Criptografia de próxima geração e autenticação multi-fator em todas as transações</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24">
+                    <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                </svg>
+                <h3>99.99% Uptime</h3>
+                <p>Infraestrutura global redundante com latência ultra-baixa</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24">
+                    <path d="M7,15H9C9,16.08 10.37,17 12,17C13.63,17 15,16.08 15,15C15,13.9 13.96,13.5 11.76,12.97C9.64,12.44 7,11.78 7,9C7,7.21 8.47,5.69 10.5,5.18V3H13.5V5.18C15.53,5.69 17,7.21 17,9H15C15,7.92 13.63,7 12,7C10.37,7 9,7.92 9,9C9,10.1 10.04,10.5 12.24,11.03C14.36,11.56 17,12.22 17,15C17,16.79 15.53,18.31 13.5,18.82V21H10.5V18.82C8.47,18.31 7,16.79 7,15Z"/>
+                </svg>
+                <h3>Pay-as-you-go</h3>
+                <p>Pague apenas pelo que usar. Sem taxas escondidas, sem surpresas</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24">
+                    <path d="M17.753,14A2.25,2.25 0 0,1 20,16.25C20,17.217 19.217,18 18.25,18A2.25,2.25 0 0,1 16,15.75A2.25,2.25 0 0,1 18.25,13.5A2.25,2.25 0 0,1 20.5,15.75H22A3.75,3.75 0 0,0 18.25,12A3.75,3.75 0 0,0 14.5,15.75A3.75,3.75 0 0,0 18.25,19.5A3.75,3.75 0 0,0 22,15.75V14H17.753M2,10.96C2,14.59 5.75,17.43 9.5,17.43C10.73,17.43 11.86,17.08 12.82,16.5C12.82,16.5 12.86,16.5 12.82,16.5C12.82,16.5 12.82,16.5 12.82,16.5C12.86,16.5 12.82,16.5 12.82,16.5L14,17.68C14,17.68 14.04,17.64 14,17.68C14,17.68 14,17.68 14,17.68C14,17.68 14,17.68 14,17.68C14,17.68 14,17.68 14,17.68V20C14,21.11 14.89,22 16,22H18C19.11,22 20,21.11 20,20V18C20,16.89 19.11,16 18,16H16C14.89,16 14,16.89 14,18V18.32L12.82,17.14C11.86,17.72 10.73,18.07 9.5,18.07C5.75,18.07 2,15.23 2,11.6V10.96M9.5,8.89C11.31,8.89 12.79,10.37 12.79,12.18S11.31,15.47 9.5,15.47C7.69,15.47 6.21,14 6.21,12.18S7.69,8.89 9.5,8.89Z"/>
+                </svg>
+                <h3>IA Assistente</h3>
+                <p>Suporte 24/7 com IA para otimizar suas integrações</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24">
+                    <path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21M16,8A2,2 0 0,0 18,6V4H20V2H16V4H14V6A2,2 0 0,0 16,8M16,5V6H17V5H16M8,8A2,2 0 0,0 10,6V4H12V2H8V4H6V6A2,2 0 0,0 8,8M8,5V6H9V5H8M12,14A2,2 0 0,0 14,12V10H16V8H12V10H10V12A2,2 0 0,0 12,14M12,11V12H13V11H12Z"/>
+                </svg>
+                <h3>Analytics Real-time</h3>
+                <p>Monitore performance, uso e custos em tempo real</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Showcase -->
+    <section class="api-showcase" id="apis">
+        <h2>APIs em Destaque</h2>
+        <div class="api-grid">
+            <div class="api-card">
+                <div class="api-header">
+                    <span class="api-category">IA/ML</span>
+                    <span class="api-price">R$ 0.05/req</span>
+                </div>
+                <h3 class="api-title">NeuralVision Pro</h3>
+                <p class="api-description">Reconhecimento de imagem com 99.8% de precisão usando redes neurais convolucionais</p>
+                <div class="api-stats">
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"/>
+                        </svg>
+                        50ms latência
+                    </span>
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/>
+                        </svg>
+                        10M+ requests/mês
+                    </span>
+                </div>
+                <button class="buy-button" onclick="addToCart('neural-vision', 'NeuralVision Pro', 0.05)">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    ADICIONAR AO CARRINHO
+                </button>
+                <button class="buy-button" onclick="openModal('NeuralVision Pro')" style="margin-top: 0.5rem; background: rgba(255, 87, 87, 0.1); border-color: var(--shadow); color: var(--shadow);">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M17,18C15.89,18 15,18.89 15,20A3,3 0 0,0 18,23A3,3 0 0,0 21,20C21,18.89 20.1,18 19,18H17M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M7,18C5.89,18 5,18.89 5,20A3,3 0 0,0 8,23A3,3 0 0,0 11,20C11,18.89 10.1,18 9,18H7Z"/>
+                    </svg>
+                    COMPRAR DIRETO
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="api-header">
+                    <span class="api-category">Blockchain</span>
+                    <span class="api-price">R$ 0.10/req</span>
+                </div>
+                <h3 class="api-title">CryptoVerify</h3>
+                <p class="api-description">Validação e auditoria de transações em múltiplas blockchains</p>
+                <div class="api-stats">
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z"/>
+                        </svg>
+                        100% seguro
+                    </span>
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M4,6H20V16H4M20,18A2,2 0 0,0 22,16V6C22,4.89 21.1,4 20,4H4C2.89,4 2,4.89 2,6V16A2,2 0 0,0 4,18H0V20H24V18H20Z"/>
+                        </svg>
+                        15+ chains
+                    </span>
+                </div>
+                <button class="buy-button" onclick="addToCart('crypto-verify', 'CryptoVerify', 0.10)">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    ADICIONAR AO CARRINHO
+                </button>
+                <button class="buy-button" onclick="openModal('CryptoVerify')" style="margin-top: 0.5rem; background: rgba(255, 87, 87, 0.1); border-color: var(--shadow); color: var(--shadow);">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M17,18C15.89,18 15,18.89 15,20A3,3 0 0,0 18,23A3,3 0 0,0 21,20C21,18.89 20.1,18 19,18H17M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M7,18C5.89,18 5,18.89 5,20A3,3 0 0,0 8,23A3,3 0 0,0 11,20C11,18.89 10.1,18 9,18H7Z"/>
+                    </svg>
+                    COMPRAR DIRETO
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="api-header">
+                    <span class="api-category">IoT</span>
+                    <span class="api-price">R$ 0.02/req</span>
+                </div>
+                <h3 class="api-title">SmartHome Connect</h3>
+                <p class="api-description">Integração universal para dispositivos IoT com protocolo unificado</p>
+                <div class="api-stats">
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+                        </svg>
+                        500+ devices
+                    </span>
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M2,3H22C23.05,3 24,3.95 24,5V19C24,20.05 23.05,21 22,21H2C0.95,21 0,20.05 0,19V5C0,3.95 0.95,3 2,3M14,6V7H22V6H14M14,8V9H21.5L22,9.5V8H14M14,10V11H21V10H14M8,13.91C6,13.91 2,15 2,17V18H14V17C14,15 10,13.91 8,13.91M8,6A3,3 0 0,0 5,9A3,3 0 0,0 8,12A3,3 0 0,0 11,9A3,3 0 0,0 8,6Z"/>
+                        </svg>
+                        MQTT/CoAP
+                    </span>
+                </div>
+                <button class="buy-button" onclick="addToCart('smarthome-connect', 'SmartHome Connect', 0.02)">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    ADICIONAR AO CARRINHO
+                </button>
+                <button class="buy-button" onclick="openModal('SmartHome Connect')" style="margin-top: 0.5rem; background: rgba(255, 87, 87, 0.1); border-color: var(--shadow); color: var(--shadow);">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M17,18C15.89,18 15,18.89 15,20A3,3 0 0,0 18,23A3,3 0 0,0 21,20C21,18.89 20.1,18 19,18H17M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M7,18C5.89,18 5,18.89 5,20A3,3 0 0,0 8,23A3,3 0 0,0 11,20C11,18.89 10.1,18 9,18H7Z"/>
+                    </svg>
+                    COMPRAR DIRETO
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="api-header">
+                    <span class="api-category">Quantum</span>
+                    <span class="api-price">R$ 0.50/req</span>
+                </div>
+                <h3 class="api-title">QuantumRandom</h3>
+                <p class="api-description">Geração de números verdadeiramente aleatórios usando mecânica quântica</p>
+                <div class="api-stats">
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                        </svg>
+                        True random
+                    </span>
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M6.76,4.84L4.96,3.05L3.12,4.89L2.05,3.82L4.89,1L6.73,2.84L6.76,4.84M12.8,10.4C12.8,8.18 14.6,6.4 16.8,6.4H18.4V8H16.8C15.43,8 14.4,9.06 14.4,10.4C14.4,11.74 15.43,12.8 16.8,12.8H18.4V14.4H16.8C14.6,14.4 12.8,12.62 12.8,10.4M5.6,10.4C5.6,8.18 7.38,6.4 9.6,6.4H11.2V8H9.6C8.23,8 7.2,9.06 7.2,10.4C7.2,11.74 8.23,12.8 9.6,12.8H11.2V14.4H9.6C7.38,14.4 5.6,12.62 5.6,10.4M10.4,9.6V11.2H12V9.6H10.4M15.6,9.6V11.2H17.2V9.6H15.6M18.88,19.11L17.04,20.95L18.21,22.12L20.05,20.28L18.88,19.11Z"/>
+                        </svg>
+                        Quantum-safe
+                    </span>
+                </div>
+                <button class="buy-button" onclick="addToCart('quantum-random', 'QuantumRandom', 0.50)">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    ADICIONAR AO CARRINHO
+                </button>
+                <button class="buy-button" onclick="openModal('QuantumRandom')" style="margin-top: 0.5rem; background: rgba(255, 87, 87, 0.1); border-color: var(--shadow); color: var(--shadow);">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M17,18C15.89,18 15,18.89 15,20A3,3 0 0,0 18,23A3,3 0 0,0 21,20C21,18.89 20.1,18 19,18H17M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M7,18C5.89,18 5,18.89 5,20A3,3 0 0,0 8,23A3,3 0 0,0 11,20C11,18.89 10.1,18 9,18H7Z"/>
+                    </svg>
+                    COMPRAR DIRETO
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="api-header">
+                    <span class="api-category">Biometria</span>
+                    <span class="api-price">R$ 0.15/req</span>
+                </div>
+                <h3 class="api-title">BioAuth Ultra</h3>
+                <p class="api-description">Autenticação multimodal: face, voz, impressão digital e íris</p>
+                <div class="api-stats">
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"/>
+                        </svg>
+                        4 modalidades
+                    </span>
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                        </svg>
+                        99.99% precisão
+                    </span>
+                </div>
+                <button class="buy-button" onclick="addToCart('bioauth-ultra', 'BioAuth Ultra', 0.15)">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    ADICIONAR AO CARRINHO
+                </button>
+                <button class="buy-button" onclick="openModal('BioAuth Ultra')" style="margin-top: 0.5rem; background: rgba(255, 87, 87, 0.1); border-color: var(--shadow); color: var(--shadow);">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M17,18C15.89,18 15,18.89 15,20A3,3 0 0,0 18,23A3,3 0 0,0 21,20C21,18.89 20.1,18 19,18H17M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M7,18C5.89,18 5,18.89 5,20A3,3 0 0,0 8,23A3,3 0 0,0 11,20C11,18.89 10.1,18 9,18H7Z"/>
+                    </svg>
+                    COMPRAR DIRETO
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="api-header">
+                    <span class="api-category">AR/VR</span>
+                    <span class="api-price">R$ 0.20/req</span>
+                </div>
+                <h3 class="api-title">MetaSpace SDK</h3>
+                <p class="api-description">Framework completo para experiências imersivas em realidade mista</p>
+                <div class="api-stats">
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M4,6H20V16H4M20,18A2,2 0 0,0 22,16V6C22,4.89 21.1,4 20,4H4C2.89,4 2,4.89 2,6V16A2,2 0 0,0 4,18H0V20H24V18H20Z"/>
+                        </svg>
+                        Cross-platform
+                    </span>
+                    <span class="api-stat">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L6.04,7.5L12,10.85L17.96,7.5L12,4.15Z"/>
+                        </svg>
+                        120fps
+                    </span>
+                </div>
+                <button class="buy-button" onclick="addToCart('metaspace-sdk', 'MetaSpace SDK', 0.20)">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    ADICIONAR AO CARRINHO
+                </button>
+                <button class="buy-button" onclick="openModal('MetaSpace SDK')" style="margin-top: 0.5rem; background: rgba(255, 87, 87, 0.1); border-color: var(--shadow); color: var(--shadow);">
+                    <svg style="width: 1rem; height: 1rem; fill: currentColor; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M17,18C15.89,18 15,18.89 15,20A3,3 0 0,0 18,23A3,3 0 0,0 21,20C21,18.89 20.1,18 19,18H17M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M7,18C5.89,18 5,18.89 5,20A3,3 0 0,0 8,23A3,3 0 0,0 11,20C11,18.89 10.1,18 9,18H7Z"/>
+                    </svg>
+                    COMPRAR DIRETO
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal do Carrinho -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Carrinho de Compras</h2>
+                <button class="close-modal" onclick="closeCart()">
+                    <svg style="width: 1.5rem; height: 1.5rem; fill: currentColor;" viewBox="0 0 24 24">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="cartItems" class="cart-items">
+                <!-- Items serão adicionados aqui dinamicamente -->
+            </div>
+            
+            <div class="cart-total">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Total:</span>
+                    <span class="cart-total-price" id="cartTotal">R$ 0,00</span>
+                </div>
+                <button class="confirm-button" onclick="proceedToCheckout()" id="checkoutBtn" disabled>
+                    FINALIZAR COMPRA →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Compra -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Processo de Compra</h2>
+                <button class="close-modal" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="purchase-steps">
+                <div class="step active" data-step="1">
+                    <h3>Escolha do Plano</h3>
+                    <div class="input-group">
+                        <label>API Selecionada:</label>
+                        <input type="text" id="selectedAPI" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>Tipo de Licença:</label>
+                        <select id="licenseSelect">
+                            <option value="29">Developer (1000 req/dia) - R$ 29/mês</option>
+                            <option value="99">Startup (10000 req/dia) - R$ 99/mês</option>
+                            <option value="499">Business (100000 req/dia) - R$ 499/mês</option>
+                            <option value="custom">Enterprise (Ilimitado) - Sob consulta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="step" data-step="2">
+                    <h3>Dados da Empresa</h3>
+                    <div class="input-group">
+                        <label>CNPJ/CPF:</label>
+                        <input type="text" placeholder="00.000.000/0000-00">
+                    </div>
+                    <div class="input-group">
+                        <label>Email Técnico:</label>
+                        <input type="email" placeholder="tech@suaempresa.com">
+                    </div>
+                </div>
+
+                <div class="step" data-step="3">
+                    <h3>Método de Pagamento</h3>
+                    <div class="payment-methods">
+                        <div class="payment-method" onclick="selectPayment(this)">
+                            <div>💳</div>
+                            <div>Cartão</div>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment(this)">
+                            <div>📱</div>
+                            <div>PIX</div>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment(this)">
+                            <div>₿</div>
+                            <div>Crypto</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step" data-step="4">
+                    <h3>Configuração da API</h3>
+                    <p style="color: rgba(108, 206, 217, 0.7); font-size: 0.9rem;">
+                        Após confirmação, você receberá:
+                        <br>• API Key única
+                        <br>• Documentação completa
+                        <br>• Sandbox para testes
+                        <br>• Suporte prioritário 24/7
+                    </p>
+                </div>
+            </div>
+
+            <button class="confirm-button" onclick="confirmPurchase()">CONFIRMAR COMPRA →</button>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <svg class="success-icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"/>
+            </svg>
+            <h2 class="success-title">Compra Realizada!</h2>
+            <div class="success-details" id="purchaseDetails">
+                <!-- Detalhes serão preenchidos pelo JavaScript -->
+            </div>
+            <div class="success-info">
+                <strong>Próximos passos:</strong><br>
+                • Suas API Keys serão enviadas para o email cadastrado<br>
+                • Acesse a documentação completa no painel de controle<br>
+                • Use o sandbox para testes gratuitos<br>
+                • Suporte prioritário 24/7 disponível
+            </div>
+            <button class="success-close" onclick="closeSuccessModal()">
+                CONTINUAR COMPRANDO
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 APIVERSE - O Futuro das Integrações</p>
+            <div class="tech-stack">
+                <span>Powered by:</span>
+                <span>Node.js</span>
+                <span>GraphQL</span>
+                <span>Kubernetes</span>
+                <span>TensorFlow</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sistema de Carrinho
+        let cart = [];
+        let cartCount = 0;
+
+        // Função para adicionar item ao carrinho
+        function addToCart(id, name, price) {
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    quantity: 1
+                });
+            }
+            
+            updateCartUI();
+            showCartNotification(name);
+        }
+
+        // Função para remover item do carrinho
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCartUI();
+        }
+
+        // Função para atualizar a interface do carrinho
+        function updateCartUI() {
+            const cartCounter = document.getElementById('cartCounter');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            
+            // Atualizar contador
+            cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCounter.textContent = cartCount;
+            
+            // Atualizar itens do carrinho
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p style="text-align: center; color: rgba(108, 206, 217, 0.7);">Seu carrinho está vazio</p>';
+                checkoutBtn.disabled = true;
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p style="color: rgba(108, 206, 217, 0.7);">Quantidade: ${item.quantity}</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
+                            <button class="cart-remove" onclick="removeFromCart('${item.id}')">
+                                <svg style="width: 1rem; height: 1rem; fill: currentColor;" viewBox="0 0 24 24">
+                                    <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                checkoutBtn.disabled = false;
+            }
+            
+            // Atualizar total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        // Função para mostrar notificação de item adicionado
+        function showCartNotification(itemName) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--accent);
+                color: var(--dark-bg);
+                padding: 1rem 1.5rem;
+                border-radius: 4px;
+                font-family: 'Orbitron', sans-serif;
+                font-weight: bold;
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = `${itemName} adicionado ao carrinho!`;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
+        // Função para abrir o carrinho
+        function openCart() {
+            const cartModal = document.getElementById('cartModal');
+            cartModal.classList.add('active');
+            updateCartUI();
+        }
+
+        // Função para fechar o carrinho
+        function closeCart() {
+            const cartModal = document.getElementById('cartModal');
+            cartModal.classList.remove('active');
+        }
+
+        // Função para prosseguir com o checkout
+        function proceedToCheckout() {
+            closeCart();
+            openModal('Checkout');
+        }
+
+        // Função para abrir modal
+        function openModal(apiName) {
+            const modal = document.getElementById('purchaseModal');
+            const apiInput = document.getElementById('selectedAPI');
+            
+            if (apiName === 'Checkout') {
+                apiInput.value = `${cart.length} APIs selecionadas - Total: R$ ${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}`;
+            } else {
+                apiInput.value = apiName;
+            }
+            
+            modal.classList.add('active');
+            animateSteps();
+        }
+
+        // Função para fechar modal
+        function closeModal() {
+            const modal = document.getElementById('purchaseModal');
+            modal.classList.remove('active');
+        }
+
+        // Função para animar os steps
+        function animateSteps() {
+            const steps = document.querySelectorAll('.step');
+            let currentStep = 0;
+            
+            const stepInterval = setInterval(() => {
+                steps.forEach(s => s.classList.remove('active'));
+                steps[currentStep].classList.add('active');
+                currentStep = (currentStep + 1) % steps.length;
+                
+                // Para após 3 ciclos
+                if (currentStep === 0) {
+                    setTimeout(() => clearInterval(stepInterval), 8000);
+                }
+            }, 2000);
+        }
+
+        // Função para selecionar método de pagamento
+        function selectPayment(element) {
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        // Função para confirmar compra
+        function confirmPurchase() {
+            const selectedAPI = document.getElementById('selectedAPI').value;
+            const licenseSelect = document.getElementById('licenseSelect');
+            const selectedLicense = licenseSelect.options[licenseSelect.selectedIndex];
+            const monthlyValue = licenseSelect.value;
+            
+            let totalItems = 0;
+            let purchaseDetails = '';
+            let totalMonthly = 0;
+            
+            if (selectedAPI.includes('APIs selecionadas')) {
+                // Checkout do carrinho
+                totalItems = cart.length;
+                const cartValue = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                
+                if (monthlyValue === 'custom') {
+                    totalMonthly = 'Sob consulta';
+                    purchaseDetails = `
+                        <div class="success-item">
+                            <span>APIs no carrinho:</span>
+                            <span>${totalItems}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Valor por uso:</span>
+                            <span>R$ ${cartValue.toFixed(2)}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Plano escolhido:</span>
+                            <span>${selectedLicense.text.split(' - ')[0]}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Total mensal:</span>
+                            <span>Sob consulta</span>
+                        </div>
+                    `;
+                } else {
+                    totalMonthly = parseFloat(monthlyValue) * totalItems;
+                    purchaseDetails = `
+                        <div class="success-item">
+                            <span>APIs no carrinho:</span>
+                            <span>${totalItems}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Valor por uso:</span>
+                            <span>R$ ${cartValue.toFixed(2)}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Plano escolhido:</span>
+                            <span>${selectedLicense.text.split(' - ')[0]}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Total mensal:</span>
+                            <span>R$ ${totalMonthly.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+            } else {
+                // Compra individual
+                totalItems = 1;
+                
+                if (monthlyValue === 'custom') {
+                    totalMonthly = 'Sob consulta';
+                    purchaseDetails = `
+                        <div class="success-item">
+                            <span>API selecionada:</span>
+                            <span>${selectedAPI}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Plano escolhido:</span>
+                            <span>${selectedLicense.text.split(' - ')[0]}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Total mensal:</span>
+                            <span>Sob consulta</span>
+                        </div>
+                    `;
+                } else {
+                    totalMonthly = parseFloat(monthlyValue);
+                    purchaseDetails = `
+                        <div class="success-item">
+                            <span>API selecionada:</span>
+                            <span>${selectedAPI}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Plano escolhido:</span>
+                            <span>${selectedLicense.text.split(' - ')[0]}</span>
+                        </div>
+                        <div class="success-item">
+                            <span>Total mensal:</span>
+                            <span>R$ ${totalMonthly.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Mostrar modal de sucesso
+            document.getElementById('purchaseDetails').innerHTML = purchaseDetails;
+            document.getElementById('successModal').classList.add('active');
+            
+            // Limpar carrinho se foi checkout
+            if (selectedAPI.includes('APIs selecionadas')) {
+                cart = [];
+                updateCartUI();
+            }
+            
+            closeModal();
+        }
+        
+        // Função para fechar modal de sucesso
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // Função para scroll até APIs
+        function scrollToAPIs() {
+            document.getElementById('apis').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Adicionar animações CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            .cart-items {
+                max-height: 300px;
+                overflow-y: auto;
+                margin: 1rem 0;
+            }
+            
+            .cart-items::-webkit-scrollbar {
+                width: 4px;
+            }
+            
+            .cart-items::-webkit-scrollbar-track {
+                background: var(--dark-bg);
+            }
+            
+            .cart-items::-webkit-scrollbar-thumb {
+                background: var(--accent);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Adicionar efeito de digitação no hero
+        document.addEventListener('DOMContentLoaded', () => {
+            const text = document.querySelector('.hero p');
+            const originalText = text.textContent;
+            text.textContent = '';
+            let i = 0;
+            
+            const typeWriter = () => {
+                if (i < originalText.length) {
+                    text.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 30);
+                }
+            };
+            
+            setTimeout(typeWriter, 500);
+            
+            // Inicializar carrinho
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
